@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ur">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cargo Adda Management</title>
+<style>
+:root{--navy:#12304a;--blue:#1769aa;--bg:#f3f6fa;--card:#fff;--green:#16805d;--red:#b83232;--line:#dbe3ec}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,"Noto Nastaliq Urdu",sans-serif;color:#1b2937}
+header{background:var(--navy);color:white;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header h1{font-size:23px;margin:0}header p{margin:5px 0 0;color:#d9e8f4;font-size:13px}
+button,.btn{border:0;border-radius:7px;padding:10px 13px;background:var(--blue);color:white;cursor:pointer;font-weight:600}button.secondary{background:#526577}button.danger{background:var(--red)}button.green{background:var(--green)}
+nav{display:flex;gap:7px;flex-wrap:wrap;padding:12px;background:#e5edf5;position:sticky;top:0;z-index:2;border-bottom:1px solid var(--line)}
+nav button{background:white;color:var(--navy);border:1px solid #cbd8e4}nav button.active{background:var(--blue);color:white}
+main{max-width:1250px;margin:20px auto;padding:0 15px}.page{display:none}.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px;margin-bottom:16px}.card{background:var(--card);padding:17px;border-radius:11px;box-shadow:0 2px 8px #17334d0d;border:1px solid var(--line)}.metric{font-size:25px;font-weight:700;margin-top:8px}.muted{color:#607184;font-size:13px}
+.panel{background:white;padding:18px;border:1px solid var(--line);border-radius:10px;margin:13px 0}.panel h2{font-size:18px;margin:0 0 15px}
+.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px}label{display:block;font-size:13px;font-weight:700;margin-bottom:5px}input,select,textarea{width:100%;padding:10px;border:1px solid #cbd6e0;border-radius:7px;background:white;font:inherit}textarea{min-height:70px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.tablewrap{overflow:auto;margin-top:13px}table{border-collapse:collapse;width:100%;min-width:720px;background:white}th,td{border-bottom:1px solid #e2e8ef;padding:10px;text-align:left;font-size:13px}th{background:#eef3f8;color:#263f55}td button{padding:6px 8px;font-size:12px}.notice{padding:12px;background:#fff8dc;border:1px solid #eadb9d;border-radius:8px;margin:12px 0;font-size:13px;line-height:1.5}.success{background:#e8f7ef;border-color:#b9e5cb}.hidden{display:none!important}.right{margin-left:auto}footer{text-align:center;color:#718096;padding:25px;font-size:12px}
+@media(max-width:600px){header h1{font-size:19px}.panel{padding:12px}nav{position:static}}
+</style>
+</head>
+<body>
+<header>
+ <div><h1>🚚 Cargo Adda Management Software</h1><p>Bilti • Customer Ledger • Payments • Kami • Expenses • Reports</p></div>
+ <div class="actions" style="margin:0"><button class="secondary" id="langBtn">اردو / English</button><button class="secondary" onclick="window.print()">Print</button></div>
+</header>
+<nav id="nav">
+<button class="active" data-page="dashboard">Dashboard</button><button data-page="bilty">Bilti Entry</button><button data-page="kami">Kami / کمی</button><button data-page="payments">Payments</button><button data-page="parties">Customer Ledger</button><button data-page="commission">Truck Commission</button><button data-page="expenses">Expenses</button><button data-page="reports">Reports & Backup</button>
+</nav>
+<main>
+<div class="notice"><b>Important:</b> This is a single HTML file. It stores records in this browser on this device (Local Storage). For shared live data across multiple users/devices, secure logins, permissions, and session/location control, a server/database is required; HTML alone cannot safely provide those features.</div>
+<section class="page active" id="dashboard">
+ <div class="grid">
+  <div class="card"><div class="muted">Total Bilti Amount</div><div class="metric" id="mBilty">Rs 0</div></div>
+  <div class="card"><div class="muted">Received Payments</div><div class="metric" id="mReceived">Rs 0</div></div>
+  <div class="card"><div class="muted">Outstanding Balance</div><div class="metric" id="mDue">Rs 0</div></div>
+  <div class="card"><div class="muted">Total Kami / کمی</div><div class="metric" id="mKami">Rs 0</div></div>
+  <div class="card"><div class="muted">Expenses + Commission</div><div class="metric" id="mCosts">Rs 0</div></div>
+ </div>
+ <div class="panel"><h2>Recent Bilti Records</h2><div class="tablewrap"><table><thead><tr><th>Date</th><th>Bilti #</th><th>Customer</th><th>Amount</th><th>Received</th><th>Kami</th><th>Due</th></tr></thead><tbody id="recentTable"></tbody></table></div></div>
+</section>
+<section class="page" id="bilty">
+ <div class="panel"><h2>New / Edit Bilti Entry</h2><input type="hidden" id="biltyEdit">
+ <div class="formgrid">
+  <div><label>Date</label><input type="date" id="bDate"></div><div><label>Bilti Number</label><input id="bNo" placeholder="e.g. B-1001"></div><div><label>Customer / Party</label><input id="bParty" placeholder="Customer name"></div><div><label>From</label><input id="bFrom"></div><div><label>To</label><input id="bTo"></div><div><label>Truck Number</label><input id="bTruck"></div><div><label>Bilti Amount (Rs)</label><input type="number" min="0" id="bAmount" value="0"></div><div><label>Received (Rs)</label><input type="number" min="0" id="bReceived" value="0"></div><div><label>Employee</label><input id="bEmployee"></div><div><label>Notes</label><input id="bNotes"></div>
+ </div><div class="actions"><button onclick="saveBilty()">Save Bilti</button><button class="secondary" onclick="resetBilty()">Clear</button></div>
+ </div>
+ <div class="panel"><h2>Bilti Register</h2><input id="biltySearch" placeholder="Search bilti, customer, truck..." oninput="renderAll()"><div class="tablewrap"><table><thead><tr><th>Date</th><th>Bilti #</th><th>Customer</th><th>Route</th><th>Truck</th><th>Amount</th><th>Received</th><th>Kami</th><th>Due</th><th>Actions</th></tr></thead><tbody id="biltyTable"></tbody></table></div></div>
+</section>
+<section class="page" id="kami">
+ <div class="panel"><h2>Kami / کمی — Customer Discount</h2><p class="muted">Example: Bilti Rs 690, received Rs 650, approved Kami Rs 40 → outstanding Rs 0.</p>
+ <div class="formgrid"><div><label>Bilti</label><select id="kBilty" onchange="kamiFill()"></select></div><div><label>Date</label><input type="date" id="kDate"></div><div><label>Customer</label><input id="kParty" readonly></div><div><label>Bilti Amount (Rs)</label><input type="number" id="kBill" readonly></div><div><label>Received (Rs)</label><input type="number" id="kReceived" min="0" value="0"></div><div><label>Approved Kami (Rs)</label><input type="number" id="kAmount" min="0" value="0"></div><div><label>Reason</label><input id="kReason" placeholder="Discount / damage / approved reason"></div><div><label>Approved By / Employee</label><input id="kEmployee"></div></div>
+ <div class="actions"><button class="green" onclick="saveKami()">Save Kami</button><button class="secondary" onclick="resetKami()">Clear</button></div><div class="notice" id="kamiCalc">Select a bilti to calculate remaining balance.</div></div>
+ <div class="panel"><h2>Kami Register</h2><div class="tablewrap"><table><thead><tr><th>Date</th><th>Bilti #</th><th>Customer</th><th>Bill</th><th>Received</th><th>Kami</th><th>Reason</th><th>Employee</th><th>Actions</th></tr></thead><tbody id="kamiTable"></tbody></table></div></div>
+</section>
+<section class="page" id="payments">
+ <div class="panel"><h2>Record Payment</h2><div class="formgrid"><div><label>Date</label><input type="date" id="pDate"></div><div><label>Customer / Party</label><input id="pParty"></div><div><label>Bilti Number (optional)</label><input id="pBilty"></div><div><label>Amount (Rs)</label><input type="number" id="pAmount" min="0"></div><div><label>Method</label><select id="pMethod"><option>Cash</option><option>Bank</option><option>Online</option><option>Other</option></select></div><div><label>Notes</label><input id="pNotes"></div></div><div class="actions"><button onclick="savePayment()">Save Payment</button></div></div>
+ <div class="panel"><h2>Payments Register</h2><div class="tablewrap"><table><thead><tr><th>Date</th><th>Customer</th><th>Bilti</th><th>Amount</th><th>Method</th><th>Notes</th><th>Action</th></tr></thead><tbody id="paymentsTable"></tbody></table></div></div>
+</section>
+<section class="page" id="parties"><div class="panel"><h2>Customer Ledger</h2><div class="formgrid"><div><label>Customer / Party Name</label><input id="ledgerName" placeholder="Enter exact customer name"></div></div><div class="actions"><button onclick="showLedger()">View Ledger</button><button class="secondary" onclick="document.getElementById('ledgerResult').innerHTML=''">Clear</button></div><div id="ledgerResult"></div></div></section>
+<section class="page" id="commission">
+ <div class="panel"><h2>Truck Commission</h2><div class="formgrid"><div><label>Date</label><input type="date" id="cDate"></div><div><label>Truck Number</label><input id="cTruck"></div><div><label>Driver / Party</label><input id="cParty"></div><div><label>Commission (Rs)</label><input type="number" id="cAmount" min="0"></div><div><label>Notes</label><input id="cNotes"></div></div><div class="actions"><button onclick="saveCommission()">Save Commission</button></div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Truck</th><th>Driver / Party</th><th>Amount</th><th>Notes</th><th>Action</th></tr></thead><tbody id="commissionTable"></tbody></table></div></div>
+</section>
+<section class="page" id="expenses">
+ <div class="panel"><h2>Business Expenses</h2><div class="formgrid"><div><label>Date</label><input type="date" id="eDate"></div><div><label>Category</label><select id="eCategory"><option>Fuel</option><option>Office</option><option>Loading / Unloading</option><option>Salary</option><option>Repair</option><option>Other</option></select></div><div><label>Details</label><input id="eDetails"></div><div><label>Amount (Rs)</label><input type="number" id="eAmount" min="0"></div></div><div class="actions"><button onclick="saveExpense()">Save Expense</button></div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Category</th><th>Details</th><th>Amount</th><th>Action</th></tr></thead><tbody id="expensesTable"></tbody></table></div></div>
+</section>
+<section class="page" id="reports">
+ <div class="panel"><h2>Reports, Export & Backup</h2><p>Export your records as CSV or download a full JSON backup. Keep backup files safe.</p><div class="actions"><button onclick="exportCSV('bilty')">Export Bilti CSV</button><button onclick="exportCSV('kami')">Export Kami CSV</button><button onclick="exportCSV('payments')">Export Payments CSV</button><button onclick="exportCSV('expenses')">Export Expenses CSV</button><button onclick="exportCSV('commission')">Export Commission CSV</button><button class="green" onclick="backupJSON()">Download Full Backup</button><label class="btn secondary" style="display:inline-block">Restore Backup <input type="file" id="restoreFile" accept=".json,application/json" style="display:none" onchange="restoreJSON(event)"></label><button class="danger" onclick="clearAll()">Delete All Data</button></div><div class="notice">Important: clearing browser data or using another browser/device may make these records unavailable unless you restore a backup.</div><div id="reportSummary"></div></div>
+</section>
+</main><footer>Cargo Adda Management • Single-file HTML version • Data remains in this browser</footer>
+<script>
+const KEY='cargoAddaHTML_v1';
+let db=loadDB(), urdu=false;
+function emptyDB(){return {bilty:[],kami:[],payments:[],expenses:[],commission:[]}}
+function loadDB(){try{return {...emptyDB(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return emptyDB()}}
+function persist(){localStorage.setItem(KEY,JSON.stringify(db));renderAll()}
+function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function val(x){return Number(x)||0}
+function money(x){return 'Rs '+val(x).toLocaleString('en-PK',{maximumFractionDigits:2})}
+function today(){return new Date().toISOString().slice(0,10)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function sum(a,f){return a.reduce((t,x)=>t+val(f(x)),0)}
+function kamiFor(b){return sum(db.kami.filter(k=>k.biltyId===b.id),k=>k.amount)}
+function receivedFor(b){return val(b.received)+sum(db.payments.filter(p=>p.biltyNo===b.no&&p.party.toLowerCase()===b.party.toLowerCase()),p=>p.amount)+sum(db.kami.filter(k=>k.biltyId===b.id),k=>k.received)}
+function dueFor(b){return Math.max(0,val(b.amount)-receivedFor(b)-kamiFor(b))}
+function initDates(){['bDate','kDate','pDate','cDate','eDate'].forEach(x=>{let el=document.getElementById(x);if(el&&!el.value)el.value=today()})}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.page).classList.add('active');renderAll()}));
+document.getElementById('langBtn').onclick=()=>{urdu=!urdu;document.documentElement.lang=urdu?'ur':'en';document.querySelector('header h1').textContent=urdu?'کارگو اڈہ مینجمنٹ سافٹ ویئر':'🚚 Cargo Adda Management Software';document.querySelector('header p').textContent=urdu?'بلٹی • کھاتہ • ادائیگیاں • کمی • اخراجات • رپورٹس':'Bilti • Customer Ledger • Payments • Kami • Expenses • Reports';};
+function saveBilty(){let edit=document.getElementById('biltyEdit').value;let no=document.getElementById('bNo').value.trim(),party=document.getElementById('bParty').value.trim(),amount=val(document.getElementById('bAmount').value),received=val(document.getElementById('bReceived').value);if(!no||!party){alert('Please enter Bilti Number and Customer.');return}if(received>amount){if(!confirm('Received is greater than bilti amount. Save anyway?'))return}
+let item={id:edit||id(),date:document.getElementById('bDate').value||today(),no,party,from:document.getElementById('bFrom').value,to:document.getElementById('bTo').value,truck:document.getElementById('bTruck').value,amount,received,employee:document.getElementById('bEmployee').value,notes:document.getElementById('bNotes').value};
+if(edit)db.bilty=db.bilty.map(x=>x.id===edit?item:x);else db.bilty.push(item);resetBilty();persist()}
+function resetBilty(){['biltyEdit','bNo','bParty','bFrom','bTo','bTruck','bEmployee','bNotes'].forEach(x=>document.getElementById(x).value='');document.getElementById('bAmount').value=0;document.getElementById('bReceived').value=0;document.getElementById('bDate').value=today()}
+function editBilty(idv){let b=db.bilty.find(x=>x.id===idv);if(!b)return;document.getElementById('biltyEdit').value=b.id;for(let [f,k] of Object.entries({bDate:'date',bNo:'no',bParty:'party',bFrom:'from',bTo:'to',bTruck:'truck',bAmount:'amount',bReceived:'received',bEmployee:'employee',bNotes:'notes'}))document.getElementById(f).value=b[k]??'';document.querySelector('[data-page="bilty"]').click();window.scrollTo(0,0)}
+function saveKami(){let b=db.bilty.find(x=>x.id===document.getElementById('kBilty').value);if(!b){alert('Please create/select a bilti first.');return}let amount=val(document.getElementById('kAmount').value),received=val(document.getElementById('kReceived').value);if(amount+received>val(b.amount)){alert('Received + Kami cannot be greater than bilti amount.');return}db.kami.push({id:id(),biltyId:b.id,biltyNo:b.no,party:b.party,date:document.getElementById('kDate').value||today(),bill:val(b.amount),received,amount,reason:document.getElementById('kReason').value,employee:document.getElementById('kEmployee').value});resetKami();persist()}
+function resetKami(){document.getElementById('kDate').value=today();document.getElementById('kReceived').value=0;document.getElementById('kAmount').value=0;document.getElementById('kReason').value='';document.getElementById('kEmployee').value='';kamiFill()}
+function kamiFill(){let b=db.bilty.find(x=>x.id===document.getElementById('kBilty').value);document.getElementById('kParty').value=b?.party||'';document.getElementById('kBill').value=b?.amount||0;let rec=val(document.getElementById('kReceived').value),kam=val(document.getElementById('kAmount').value);document.getElementById('kamiCalc').textContent=b?`Bill: ${money(b.amount)} | This entry received: ${money(rec)} | This entry Kami: ${money(kam)} | Estimated remaining after this entry: ${money(Math.max(0,val(b.amount)-receivedFor(b)-kamiFor(b)-rec-kam))}`:'Select a bilti to calculate remaining balance.'}
+['kReceived','kAmount'].forEach(x=>document.getElementById(x).addEventListener('input',kamiFill));
+function savePayment(){let party=document.getElementById('pParty').value.trim(),amount=val(document.getElementById('pAmount').value);if(!party||amount<=0){alert('Enter customer and payment amount.');return}db.payments.push({id:id(),date:document.getElementById('pDate').value||today(),party,biltyNo:document.getElementById('pBilty').value.trim(),amount,method:document.getElementById('pMethod').value,notes:document.getElementById('pNotes').value});['pParty','pBilty','pAmount','pNotes'].forEach(x=>document.getElementById(x).value='');persist()}
+function saveCommission(){let amount=val(document.getElementById('cAmount').value);if(amount<=0){alert('Enter commission amount.');return}db.commission.push({id:id(),date:document.getElementById('cDate').value||today(),truck:document.getElementById('cTruck').value,party:document.getElementById('cParty').value,amount,notes:document.getElementById('cNotes').value});['cTruck','cParty','cAmount','cNotes'].forEach(x=>document.getElementById(x).value='');persist()}
+function saveExpense(){let amount=val(document.getElementById('eAmount').value);if(amount<=0){alert('Enter expense amount.');return}db.expenses.push({id:id(),date:document.getElementById('eDate').value||today(),category:document.getElementById('eCategory').value,details:document.getElementById('eDetails').value,amount});document.getElementById('eDetails').value='';document.getElementById('eAmount').value='';persist()}
+function del(kind,idv){if(!confirm('Delete this record?'))return;db[kind]=db[kind].filter(x=>x.id!==idv);persist()}
+function renderAll(){
+let total=sum(db.bilty,x=>x.amount),received=sum(db.bilty,x=>x.received)+sum(db.payments,x=>x.amount)+sum(db.kami,x=>x.received),kami=sum(db.kami,x=>x.amount),due=sum(db.bilty,dueFor),costs=sum(db.expenses,x=>x.amount)+sum(db.commission,x=>x.amount);
+document.getElementById('mBilty').textContent=money(total);document.getElementById('mReceived').textContent=money(received);document.getElementById('mDue').textContent=money(due);document.getElementById('mKami').textContent=money(kami);document.getElementById('mCosts').textContent=money(costs);
+let search=(document.getElementById('biltySearch')?.value||'').toLowerCase();let rows=db.bilty.filter(b=>[b.no,b.party,b.truck,b.from,b.to].join(' ').toLowerCase().includes(search)).map(b=>`<tr><td>${esc(b.date)}</td><td>${esc(b.no)}</td><td>${esc(b.party)}</td><td>${esc(b.from)} → ${esc(b.to)}</td><td>${esc(b.truck)}</td><td>${money(b.amount)}</td><td>${money(receivedFor(b))}</td><td>${money(kamiFor(b))}</td><td>${money(dueFor(b))}</td><td><button onclick="editBilty('${b.id}')">Edit</button> <button class="danger" onclick="del('bilty','${b.id}')">Delete</button></td></tr>`).join('');
+document.getElementById('biltyTable').innerHTML=rows||'<tr><td colspan="10">No records yet.</td></tr>';
+document.getElementById('recentTable').innerHTML=db.bilty.slice(-6).reverse().map(b=>`<tr><td>${esc(b.date)}</td><td>${esc(b.no)}</td><td>${esc(b.party)}</td><td>${money(b.amount)}</td><td>${money(receivedFor(b))}</td><td>${money(kamiFor(b))}</td><td>${money(dueFor(b))}</td></tr>`).join('')||'<tr><td colspan="7">No records yet.</td></tr>';
+document.getElementById('kBilty').innerHTML='<option value="">Select Bilti</option>'+db.bilty.map(b=>`<option value="${b.id}">${esc(b.no)} — ${esc(b.party)} (${money(b.amount)})</option>`).join('');
+document.getElementById('kamiTable').innerHTML=db.kami.slice().reverse().map(k=>`<tr><td>${esc(k.date)}</td><td>${esc(k.biltyNo)}</td><td>${esc(k.party)}</td><td>${money(k.bill)}</td><td>${money(k.received)}</td><td>${money(k.amount)}</td><td>${esc(k.reason)}</td><td>${esc(k.employee)}</td><td><button class="danger" onclick="del('kami','${k.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="9">No Kami records yet.</td></tr>';
+document.getElementById('paymentsTable').innerHTML=db.payments.slice().reverse().map(p=>`<tr><td>${esc(p.date)}</td><td>${esc(p.party)}</td><td>${esc(p.biltyNo)}</td><td>${money(p.amount)}</td><td>${esc(p.method)}</td><td>${esc(p.notes)}</td><td><button class="danger" onclick="del('payments','${p.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="7">No payments yet.</td></tr>';
+document.getElementById('commissionTable').innerHTML=db.commission.slice().reverse().map(c=>`<tr><td>${esc(c.date)}</td><td>${esc(c.truck)}</td><td>${esc(c.party)}</td><td>${money(c.amount)}</td><td>${esc(c.notes)}</td><td><button class="danger" onclick="del('commission','${c.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="6">No commissions yet.</td></tr>';
+document.getElementById('expensesTable').innerHTML=db.expenses.slice().reverse().map(e=>`<tr><td>${esc(e.date)}</td><td>${esc(e.category)}</td><td>${esc(e.details)}</td><td>${money(e.amount)}</td><td><button class="danger" onclick="del('expenses','${e.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="5">No expenses yet.</td></tr>';
+document.getElementById('reportSummary').innerHTML=`<div class="grid"><div class="card">Bilti Records<div class="metric">${db.bilty.length}</div></div><div class="card">Kami Entries<div class="metric">${db.kami.length}</div></div><div class="card">Payments<div class="metric">${db.payments.length}</div></div><div class="card">Net Generated (Bilti − Kami)<div class="metric">${money(total-kami)}</div></div></div>`;
+if(document.activeElement.id!=='kBilty')kamiFill();
+}
+function showLedger(){let name=document.getElementById('ledgerName').value.trim().toLowerCase();if(!name){alert('Enter customer name.');return}let bs=db.bilty.filter(b=>b.party.toLowerCase()===name),ps=db.payments.filter(p=>p.party.toLowerCase()===name),ks=db.kami.filter(k=>k.party.toLowerCase()===name);let html=`<h3>Ledger: ${esc(document.getElementById('ledgerName').value)}</h3><p>Total Bilti: <b>${money(sum(bs,b=>b.amount))}</b> | Payments: <b>${money(sum(ps,p=>p.amount)+sum(bs,b=>b.received)+sum(ks,k=>k.received))}</b> | Kami: <b>${money(sum(ks,k=>k.amount))}</b> | Outstanding on bilti records: <b>${money(sum(bs,dueFor))}</b></p><div class="tablewrap"><table><thead><tr><th>Date</th><th>Type</th><th>Reference</th><th>Amount</th><th>Details</th></tr></thead><tbody>`;bs.forEach(b=>html+=`<tr><td>${esc(b.date)}</td><td>Bilti</td><td>${esc(b.no)}</td><td>${money(b.amount)}</td><td>${esc(b.from)} → ${esc(b.to)}</td></tr>`);ps.forEach(p=>html+=`<tr><td>${esc(p.date)}</td><td>Payment</td><td>${esc(p.biltyNo)}</td><td>− ${money(p.amount)}</td><td>${esc(p.method)}</td></tr>`);ks.forEach(k=>html+=`<tr><td>${esc(k.date)}</td><td>Kami</td><td>${esc(k.biltyNo)}</td><td>− ${money(k.amount)}</td><td>${esc(k.reason)}</td></tr>`);html+='</tbody></table></div>';document.getElementById('ledgerResult').innerHTML=html}
+function exportCSV(kind){let arr=db[kind];if(!arr.length){alert('No records to export.');return}let keys=[...new Set(arr.flatMap(Object.keys))],csv=[keys.join(','),...arr.map(o=>keys.map(k=>'"'+String(o[k]??'').replace(/"/g,'""')+'"').join(','))].join('\r\n');download(`${kind}.csv`,'text/csv;charset=utf-8',csv)}
+function backupJSON(){download('cargo-adda-backup.json','application/json',JSON.stringify(db,null,2))}
+function download(name,type,content){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff',content],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
+function restoreJSON(ev){let f=ev.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.bilty||!x.kami)throw Error();db={...emptyDB(),...x};persist();alert('Backup restored.')}catch(e){alert('Invalid backup file.')}};r.readAsText(f);ev.target.value=''}
+function clearAll(){if(confirm('This permanently deletes all records from this browser. Download a backup first. Continue?')&&confirm('Are you absolutely sure?')){db=emptyDB();persist()}}
+initDates();renderAll();
+</script>
+</body></html>
